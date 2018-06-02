@@ -37,11 +37,9 @@
 
 
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
-set(CMAKE_CXX_STANDARD 11)
 
-# Override flags to enable prepare for linking to static runtime
-set(CMAKE_USER_MAKE_RULES_OVERRIDE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/c_flag_overrides.cmake)
-set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cxx_flag_overrides.cmake)
+# Use c++11
+set(CMAKE_CXX_STANDARD 11)
 
 # Set a private module find path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -52,37 +50,20 @@ project(E57Format)
 set(${PROJECT_NAME}_MAJOR_VERSION 2)
 set(${PROJECT_NAME}_MINOR_VERSION 0)
 
+# Create revision ID
 include(Tags)
+add_definitions(-DREVISION_ID="${PROJECT_NAME}-${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}-${${PROJECT_NAME}_BUILD_TAG}")
 
-# propose a default installation directory
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    string(REGEX REPLACE "/${PROJECT_NAME}" "" CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
-    set(T_ ${PROJECT_NAME})
-    set(T_ ${T_}-${${PROJECT_NAME}_MAJOR_VERSION})
-    set(T_ ${T_}.${${PROJECT_NAME}_MINOR_VERSION})
-    set(T_ ${T_}-${${PROJECT_NAME}_BUILD_TAG})
-    set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/${T_}
-        CACHE PATH
-        "Install path prefix, prepended onto install directories."
-        FORCE
-    )
-endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
+# Use boost
 find_package(Threads REQUIRED)
 
-set(Xerces_USE_STATIC_LIBS On)
-find_package(Xerces QUIET)
-if (NOT Xerces_FOUND)
-    set(XERCES_ROOT CACHE PATH "Location of the xerces library")
-    message(FATAL_ERROR
-"Unable to find xerces library.
-Please set the the XERCES_ROOT to point to the root of the xerces directory."
-)
-endif (NOT Xerces_FOUND)
+# Use xerces
+find_package(XercesC REQUIRED)
+set(XML_LIBRARIES ${XercesC_LIBRARY})
+set(XML_INCLUDE_DIRS ${XercesC_INCLUDE_DIR})
 
-set(XML_LIBRARIES ${Xerces_LIBRARY})
-set(XML_INCLUDE_DIRS ${Xerces_INCLUDE_DIR})
-
+# Use ICU
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     add_definitions(-DLINUX)
     find_package(ICU REQUIRED)
@@ -94,9 +75,7 @@ elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     add_definitions(-DWINDOWS)
 endif()
 
-add_definitions(-DXERCES_STATIC_LIBRARY)
-add_definitions(-DREVISION_ID="${PROJECT_NAME}-${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}-${${PROJECT_NAME}_BUILD_TAG}")
-
+# Include directories
 include_directories(
     ${PROJECT_BINARY_DIR}/include
     include
@@ -113,25 +92,13 @@ include_directories( contrib/CRCpp/inc )
 # The reference implementation
 #
 
-add_library( E57Format STATIC
-    src/CheckedFile.h
+add_library( E57Format SHARED
     src/CheckedFile.cpp
-    src/Common.h
-    src/Decoder.h
     src/Decoder.cpp
-    src/Encoder.h
     src/Encoder.cpp
     src/E57Foundation.cpp
     src/E57FoundationImpl.cpp
-    src/E57FoundationImpl.h
-    src/E57XmlParser.h
     src/E57XmlParser.cpp
-    include/E57Foundation.h
-    contrib/CRCpp/inc/CRC.h
-)
-set_target_properties( E57Format PROPERTIES
-    DEBUG_POSTFIX "-d"
-    POSITION_INDEPENDENT_CODE ON
 )
 
 #
@@ -141,10 +108,17 @@ set_target_properties( E57Format PROPERTIES
 install(
     TARGETS
         E57Format
-    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
 )
+
 install(
     FILES
         include/E57Foundation.h
     DESTINATION include/E57Format
+)
+
+install(
+    FILES
+        cmake/E57FormatConfig.cmake
+    DESTINATION share/E57Format/
 )
