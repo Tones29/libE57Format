@@ -101,6 +101,8 @@ add_library( E57Format SHARED
     src/E57XmlParser.cpp
 )
 
+target_link_libraries(E57Format ${XML_LIBRARIES})
+
 #
 # Install section
 #
