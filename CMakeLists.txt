@@ -103,6 +103,8 @@ add_library( E57Format SHARED
 
 target_link_libraries(E57Format ${XML_LIBRARIES})
 
+set_target_properties(E57Format PROPERTIES DEBUG_POSTFIX "-d")
+
 #
 # Install section
 #
