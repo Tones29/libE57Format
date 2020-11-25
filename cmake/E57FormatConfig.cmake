@@ -64,6 +64,7 @@ SET(E57Format_FOUND TRUE)
 FIND_PATH(E57Format_INCLUDE_DIR
     NAMES "E57Format/E57Foundation.h"
     PATHS
+      ${E57Format_DIR}/../../include
     	${E57Format_DIR}/include
     	/usr/local/include    	
     DOC "E57 include directory"
@@ -73,6 +74,7 @@ FIND_LIBRARY(E57Format_LIBRARY_RELEASE
     NAMES   "libE57Format"
             "E57Format"
     HINTS 
+      ${E57Format_DIR}/../../lib
     	${E57Format_DIR}/lib
     	/usr/local/lib
     DOC "E57 release library"
@@ -83,6 +85,7 @@ FIND_LIBRARY(E57Format_LIBRARY_DEBUG
     	"libE57Format-d"
         "E57Format-d"
     HINTS 
+      ${E57Format_DIR}/../../lib
     	${E57Format_DIR}/lib
     	/usr/local/lib
     DOC "E57 debug library"

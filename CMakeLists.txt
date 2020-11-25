@@ -42,7 +42,7 @@ cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 set(CMAKE_CXX_STANDARD 11)
 
 # Ensure the dll and lib contain all symbols
-set(WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS YES CACHE BOOL "Export all symbols")
 
 # Set a private module find path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
