@@ -41,6 +41,9 @@ cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 # Use c++11
 set(CMAKE_CXX_STANDARD 11)
 
+# Ensure the dll and lib contain all symbols
+set(WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 # Set a private module find path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -112,6 +115,8 @@ set_target_properties(E57Format PROPERTIES DEBUG_POSTFIX "-d")
 install(
     TARGETS
         E57Format
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
 )
 
